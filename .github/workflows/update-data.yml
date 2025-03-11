@@ -17,6 +17,9 @@ jobs:
       - name: Fetch Weather Data
         run: curl -sS "https://script.google.com/macros/s/AKfycbx1SgDH33eWMDWywwaObK7-uFkfw4UE2I5H9dAfaxG7xKWslwkXziq9QYrOMWekLfpI/exec" -o data/weather.json
 
+      - name: Debug JSON Output
+        run: cat data/weather.json
+        
       - name: Commit and Push Changes
         run: |
           git config --global user.name "github-actions"
