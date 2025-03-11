@@ -1,20 +1,89 @@
+
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Weather Dashboard</title>
-    <script src="script.js" defer></script>
-    <style>
-        body { font-family: Arial, sans-serif; text-align: center; }
-        table { width: 100%; border-collapse: collapse; }
-        th, td { border: 1px solid black; padding: 8px; text-align: center; }
-        canvas { width: 100%; max-width: 600px; }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Weather Data</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-    <h1>Weather Dashboard</h1>
-    <table id="weatherTable"></table>
-    <canvas id="weatherChart"></canvas>
+  <h1>Weather Data</h1>
+  <div id="weather-table"></div>
+  <canvas id="weather-chart" width="400" height="200"></canvas>
+
+  <script>
+    // Fetch the weather data from the Google Script URL
+    fetch("https://script.google.com/macros/s/AKfycbx1SgDH33eWMDWywwaObK7-uFkfw4UE2I5H9dAfaxG7xKWslwkXziq9QYrOMWekLfpI/exec")
+      .then(response => response.json())
+      .then(data => {
+        const weatherData = data["Weather Data"];
+        
+        // Create a table
+        let tableHTML = "<table border='1'><tr><th>Timestamp</th><th>Temperature (°C)</th><th>Wind Speed (m/s)</th><th>Wind Direction</th><th>Humidity (%)</th></tr>";
+        weatherData.forEach(item => {
+          tableHTML += `
+            <tr>
+              <td>${item.Timestamp}</td>
+              <td>${item.Temperature}</td>
+              <td>${item.WindSpeed}</td>
+              <td>${item.WindDirection}</td>
+              <td>${item.Humidity}</td>
+            </tr>
+          `;
+        });
+        tableHTML += "</table>";
+        document.getElementById("weather-table").innerHTML = tableHTML;
+
+        // Prepare the data for the chart
+        const labels = weatherData.map(item => item.Timestamp);
+        const temperatures = weatherData.map(item => item.Temperature);
+        const windSpeeds = weatherData.map(item => item.WindSpeed);
+
+        // Create the chart
+        const ctx = document.getElementById("weather-chart").getContext("2d");
+        const weatherChart = new Chart(ctx, {
+          type: "line",
+          data: {
+            labels: labels,
+            datasets: [
+              {
+                label: "Temperature (°C)",
+                data: temperatures,
+                borderColor: "red",
+                fill: false
+              },
+              {
+                label: "Wind Speed (m/s)",
+                data: windSpeeds,
+                borderColor: "blue",
+                fill: false
+              }
+            ]
+          },
+          options: {
+            responsive: true,
+            scales: {
+              x: {
+                type: "category",
+                title: {
+                  display: true,
+                  text: "Timestamp"
+                }
+              },
+              y: {
+                title: {
+                  display: true,
+                  text: "Value"
+                }
+              }
+            }
+          }
+        });
+      })
+      .catch(error => console.error("Error fetching weather data:", error));
+  </script>
 </body>
 </html>
