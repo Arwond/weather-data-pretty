@@ -11,8 +11,11 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v3
 
+      - name: Create data folder if missing
+        run: mkdir -p data  # Ensure "data" directory exists
+
       - name: Fetch Weather Data
-        run: curl -o data/weather.json "https://script.google.com/macros/s/AKfycbx1SgDH33eWMDWywwaObK7-uFkfw4UE2I5H9dAfaxG7xKWslwkXziq9QYrOMWekLfpI/exec"
+        run: curl -sS "https://script.google.com/macros/s/AKfycbx1SgDH33eWMDWywwaObK7-uFkfw4UE2I5H9dAfaxG7xKWslwkXziq9QYrOMWekLfpI/exec" -o data/weather.json
 
       - name: Commit and Push Changes
         run: |
@@ -21,3 +24,6 @@ jobs:
           git add data/weather.json
           git commit -m "Updated Weather Data" || echo "No changes"
           git push
+
+
+
