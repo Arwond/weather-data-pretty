@@ -10,6 +10,8 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3
+        with:
+          persist-credentials: false  # Disable default credentials
 
       - name: Create data folder if missing
         run: mkdir -p data  # Ensure "data" directory exists
