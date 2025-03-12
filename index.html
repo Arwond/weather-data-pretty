@@ -51,6 +51,7 @@
     .chart-container {
       width: 100%;
       max-width: 800px;
+      height: 400px; /* Increased chart height */
       margin-top: 40px;
     }
 
@@ -77,6 +78,7 @@
         <th>Temperature (°C)</th>
         <th>Wind Speed (m/s)</th>
         <th>Wind Direction</th>
+        <th>Wind</th>
         <th>Humidity (%)</th>
       </tr>
     </thead>
@@ -123,6 +125,10 @@
         windDirection.textContent = entry["Wind Direction"];
         row.appendChild(windDirection);
 
+        const wind = document.createElement('td');
+        wind.textContent = entry["Wind"];
+        row.appendChild(wind);
+
         const humidity = document.createElement('td');
         humidity.textContent = entry["Humidity (%)"];
         row.appendChild(humidity);
@@ -151,14 +157,14 @@
               data: temperatureData,
               borderColor: 'red',
               fill: false,
-              borderWidth: 2
+              borderWidth: 4 // Thicker line for temperature
             },
             {
               label: 'Wind Speed (m/s)',
               data: windSpeedData,
               borderColor: 'blue',
               fill: false,
-              borderWidth: 2
+              borderWidth: 4 // Thicker line for wind speed
             }
           ]
         },
