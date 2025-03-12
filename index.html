@@ -142,7 +142,7 @@
       const ctx = document.getElementById('weatherChart').getContext('2d');
       
       // Prepare data for chart
-      const labels = data.map(entry => new Date(entry.Timestamp).toLocaleString());
+      const labels = data.map(entry => new Date(entry.Timestamp).toLocaleString('en-GB'));
       const temperatureData = data.map(entry => entry["Temperature (°C)"]);
       const windSpeedData = data.map(entry => entry["Wind Speed (m/s)"]);
 
