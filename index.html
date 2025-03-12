@@ -110,7 +110,7 @@
         const row = document.createElement('tr');
 
         const timestamp = document.createElement('td');
-        timestamp.textContent = new Date(entry.Timestamp).toLocaleString();
+        timestamp.textContent = new Date(entry.Timestamp).toLocaleString('en-GB');
         row.appendChild(timestamp);
 
         const temperature = document.createElement('td');
