@@ -48,17 +48,24 @@
     }
 
     .chart-container {
-      width: 100%;
-      max-width: 800px;
-      height: 400px; /* Increased chart height */
-      margin-top: 40px;
+      width: 100vw; /* Full screen width */
+      max-width: 95vw; /* Prevents overflowing on large screens */
+      height: 50vh; /* Adjust height dynamically */
+      max-height: 700px; /* Prevents excessive height */
+      min-height: 300px; /* Ensures visibility on small screens */
+      margin-top: 40px; 
     }
 
     @media (max-width: 600px) {
       table, th, td {
         font-size: 12px;
       }
+
+      .chart-container {
+        height: 40vh; /* Reduce height for small screens */
+      }
     }
+
   </style>
 </head>
 <body>
@@ -210,17 +217,14 @@ function generateChart(data) {
             responsive: true,
             maintainAspectRatio: false,
             scales: {
-                xAxes: [{ 
-                    type: 'time', 
-                    time: { 
-                        unit: 'minute' 
-                    },
-                    ticks: { 
-                        autoSkip: true, 
-                        maxTicksLimit: 10 
-                    }
-                }]
+            x: { 
+              ticks: { 
+                autoSkip: true, 
+                maxTicksLimit: 10 
+              }
             }
+          }
+
         }
     });
 }
