@@ -56,6 +56,26 @@
       margin-top: 40px; 
     }
 
+    .pagination {
+      display: flex;
+      justify-content: center;
+      margin: 20px 0;
+    }
+
+    .pagination button {
+      margin: 0 5px;
+      padding: 8px 16px;
+      border: none;
+      background-color: #4CAF50;
+      color: white;
+      cursor: pointer;
+    }
+
+    .pagination button[disabled] {
+      background-color: #ddd;
+      cursor: not-allowed;
+    }
+
     @media (max-width: 600px) {
       table, th, td {
         font-size: 12px;
@@ -92,9 +112,15 @@
     <tbody id="weather-data"></tbody>
   </table>
 
+  <!-- Pagination controls -->
+  <div class="pagination" id="pagination-controls"></div>
+
 <script>
+  const itemsPerPage = 50;
+  let currentPage = 1;
+  let weatherData = [];
+
   // Fetch the weather data from the GitHub repository
-   // Fetch the weather data from the GitHub repository
   fetch('https://raw.githubusercontent.com/Arwond/weather-data-pretty/main/data/weather.json')
     .then(response => response.json())
     .then(data => {
@@ -104,29 +130,30 @@
       });
       data["Weather Data"].reverse();
       
-      // Call function to display the data in the table
-      displayWeatherData(data["Weather Data"]);
-      
-      // Call function to generate the chart
-      generateChart(data["Weather Data"]);
+      weatherData = data["Weather Data"];
+      displayWeatherData(weatherData, currentPage);
+      generateChart(weatherData);
+      updatePaginationControls();
     })
     .catch(error => console.log('Error fetching data:', error));
 
   // Function to display weather data in the table
-  function displayWeatherData(data) {
+  function displayWeatherData(data, page) {
     const tableBody = document.getElementById('weather-data');
     tableBody.innerHTML = ''; // Clear any existing table rows
 
-    data.forEach(entry => {
+    const start = (page - 1) * itemsPerPage;
+    const end = start + itemsPerPage;
+    const paginatedData = data.slice(start, end);
+
+    paginatedData.forEach(entry => {
       const row = document.createElement('tr');
 
       const timestamp = document.createElement('td');
-      
       if (entry.Timestamp === null) {
         console.error("Invalid Timestamp:", entry.Timestamp);
         return; // Skip this entry if timestamp cannot be corrected
       }
-      
       timestamp.textContent = entry.Timestamp; 
       row.appendChild(timestamp);
 
@@ -153,16 +180,13 @@
       const humidity = document.createElement('td');
       humidity.textContent = entry["Humidity (%)"];
       row.appendChild(humidity);
-      
-
 
       tableBody.appendChild(row);
     });
   }
 
-
-// Function to generate the chart
-function generateChart(data) {
+  // Function to generate the chart
+  function generateChart(data) {
     const ctx = document.getElementById('weatherChart').getContext('2d');
     
     // Prepare data for chart
@@ -173,8 +197,6 @@ function generateChart(data) {
     // Get current time
     const now = new Date();
 
-	
-	
     // Filter data for the last 48 hours
     const filteredData = data.filter(entry => {
         if (entry.Timestamp === null) {
@@ -186,7 +208,7 @@ function generateChart(data) {
         const entryDate = new Date(entry.Timestamp);
         return (now - entryDate) <= (48 * 60 * 60 * 1000); // Check if within last 48 hours
     });
-	
+    
     filteredData.forEach(entry => {        
         if (entry.Timestamp === null) {
             console.error("Invalid Timestamp:", entry.Timestamp);
@@ -234,48 +256,67 @@ function generateChart(data) {
 
         }
     });
-}
+  }
 
+  // Function to format timestamps and convert them to yyyy-mm-dd HH:mm format
+  function formatTimestamp(timestamp) {
+    try {
+      let dateObj;
 
-// Function to format timestamps and convert them to yyyy-mm-dd HH:mm format
-function formatTimestamp(timestamp) {
-	try {
-	  let dateObj;
-		
-	  // Check for "yyyy-dd-mmTHH:mm:ss.000Z" format
-	  if (timestamp.includes("T")) {
-	    let parts = timestamp.split(/[-T:.Z]/); // Split into components
-		
-	    if (parts.length !== 8) return null; // Must have year, day, month, hour, minute
+      // Check for "yyyy-dd-mmTHH:mm:ss.000Z" format
+      if (timestamp.includes("T")) {
+        let parts = timestamp.split(/[-T:.Z]/); // Split into components
 
-	    const year = parseInt(parts[0]);
-	    const month = parseInt(parts[1]);
-	    const day = parseInt(parts[2]);
-	    const hours = parseInt(parts[3]);
-	    const minutes = parseInt(parts[4]);
+        if (parts.length !== 8) return null; // Must have year, day, month, hour, minute
 
-	    dateObj = new Date(year, month - 1, day, hours, minutes); // Month is zero-based in JS Date
+        const year = parseInt(parts[0]);
+        const month = parseInt(parts[1]);
+        const day = parseInt(parts[2]);
+        const hours = parseInt(parts[3]);
+        const minutes = parseInt(parts[4]);
 
-	  } else if (timestamp.includes(" ")) { // Check for "dd-MM-yyyy HH:mm" format
-	    let [datePart, timePart] = timestamp.split(" ");
-	    let [day, month, year] = datePart.split("-").map(Number);
-	    let [hours, minutes] = timePart.split(":").map(Number);
+        dateObj = new Date(year, month - 1, day, hours, minutes); // Month is zero-based in JS Date
 
-	    dateObj = new Date(year, month - 1, day, hours, minutes); // Month is zero-based in JS Date
+      } else if (timestamp.includes(" ")) { // Check for "dd-MM-yyyy HH:mm" format
+        let [datePart, timePart] = timestamp.split(" ");
+        let [day, month, year] = datePart.split("-").map(Number);
+        let [hours, minutes] = timePart.split(":").map(Number);
 
-	  } else {
-	    return null; // Invalid format
-	  }
+        dateObj = new Date(year, month - 1, day, hours, minutes); // Month is zero-based in JS Date
 
-	  // Format date as yyyy-mm-dd HH:mm
-	  let formattedDate = `${dateObj.getFullYear()}-${String(dateObj.getMonth() + 1).padStart(2, '0')}-${String(dateObj.getDate()).padStart(2, '0')} ${String(dateObj.getHours()).padStart(2, '0')}:${String(dateObj.getMinutes()).padStart(2, '0')}`;
+      } else {
+        return null; // Invalid format
+      }
 
-	  return formattedDate; // Return formatted date string
-	} catch (error) {
-	  console.error("Error formatting timestamp:", error);
-	  return null;
-	}
-}
+      // Format date as yyyy-mm-dd HH:mm
+      let formattedDate = `${dateObj.getFullYear()}-${String(dateObj.getMonth() + 1).padStart(2, '0')}-${String(dateObj.getDate()).padStart(2, '0')} ${String(dateObj.getHours()).padStart(2, '0')}:${String(dateObj.getMinutes()).padStart(2, '0')}`;
+
+      return formattedDate; // Return formatted date string
+    } catch (error) {
+      console.error("Error formatting timestamp:", error);
+      return null;
+    }
+  }
+
+  // Function to update pagination controls
+  function updatePaginationControls() {
+    const paginationControls = document.getElementById('pagination-controls');
+    paginationControls.innerHTML = ''; // Clear existing controls
+
+    const totalPages = Math.ceil(weatherData.length / itemsPerPage);
+
+    for (let i = 1; i <= totalPages; i++) {
+      const button = document.createElement('button');
+      button.textContent = i;
+      button.disabled = i === currentPage;
+      button.addEventListener('click', () => {
+        currentPage = i;
+        displayWeatherData(weatherData, currentPage);
+        updatePaginationControls();
+      });
+      paginationControls.appendChild(button);
+    }
+  }
 
 </script>
 
