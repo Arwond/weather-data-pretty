@@ -82,6 +82,7 @@
       <tr>
         <th>Time</th>
         <th>(°C)</th>
+        <th>FL</th>
         <th>(m/s)</th>
         <th>NWSE</th>
         <th>Wind</th>
@@ -133,6 +134,10 @@
       temperature.textContent = entry["Temperature (°C)"];
       row.appendChild(temperature);
 
+      const feelslike = document.createElement('td');
+      feelslike.textContent = entry["FeelsLike"];
+      row.appendChild(feelslike);
+
       const windSpeed = document.createElement('td');
       windSpeed.textContent = entry["Wind Speed (m/s)"];
       row.appendChild(windSpeed);
@@ -148,6 +153,8 @@
       const humidity = document.createElement('td');
       humidity.textContent = entry["Humidity (%)"];
       row.appendChild(humidity);
+      
+
 
       tableBody.appendChild(row);
     });
