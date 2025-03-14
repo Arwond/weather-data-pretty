@@ -193,7 +193,8 @@
     const labels = [];
     const temperatureData = [];
     const windSpeedData = [];
-
+    const feelsLike = [];
+    
     // Get current time
     const now = new Date();
 
@@ -218,6 +219,7 @@
         labels.push(entry.Timestamp);
         temperatureData.push(parseFloat(entry["Temperature (°C)"]));
         windSpeedData.push(parseFloat(entry["Wind Speed (m/s)"]));
+	feelsLike.push(parseFloat(entry["FeelsLike"]));
     });
 
     // Create chart
@@ -231,14 +233,21 @@
                     data: temperatureData,
                     borderColor: 'red',
                     fill: false,
-                    borderWidth: 0.5 // Thicker line for temperature
+                    borderWidth: 2 // Thicker line for temperature
                 },
                 {
                     label: 'Wind Speed (m/s)',
                     data: windSpeedData,
                     borderColor: 'blue',
                     fill: false,
-                    borderWidth: 0.5 // Thicker line for wind speed
+                    borderWidth: 2 // Thicker line for wind speed
+                },
+		{
+                    label: 'Feels like (°C)',
+                    data: feelsLike,
+                    borderColor: 'purple',
+                    fill: false,
+                    borderWidth: 2 // Thicker line for wind speed
                 }
             ]
         },
