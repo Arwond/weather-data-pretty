@@ -116,7 +116,8 @@
   <div class="pagination" id="pagination-controls"></div>
 
 <script>
-  const itemsPerPage = 50;
+  // 1 day
+  const itemsPerPage = 144;
   let currentPage = 1;
   let weatherData = [];
 
@@ -129,8 +130,9 @@
         entry.Timestamp = formatTimestamp(entry.Timestamp);
       });
       data["Weather Data"].reverse();
-      
-      weatherData = data["Weather Data"];
+      // 7 days
+      weatherData = data["Weather Data"].slice(0, 1008);
+
       displayWeatherData(weatherData, currentPage);
       generateChart(weatherData);
       updatePaginationControls();
@@ -233,21 +235,24 @@
                     data: temperatureData,
                     borderColor: 'red',
                     fill: false,
-                    borderWidth: 2 // Thicker line for temperature
+                    borderWidth: 2,	 // Thicker line for temperature
+		    pointRadius: 0.5
                 },
                 {
                     label: 'Wind Speed (m/s)',
                     data: windSpeedData,
                     borderColor: 'blue',
                     fill: false,
-                    borderWidth: 2 // Thicker line for wind speed
+                    borderWidth: 2, // Thicker line for wind speed
+                    pointRadius: 0.5
                 },
 		{
                     label: 'Feels like (°C)',
                     data: feelsLike,
                     borderColor: 'purple',
                     fill: false,
-                    borderWidth: 2 // Thicker line for wind speed
+                    borderWidth: 2, // Thicker line for wind speed
+                    pointRadius: 0.5
                 }
             ]
         },
